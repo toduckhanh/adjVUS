@@ -1,4 +1,5 @@
 #' @import utils
+#' @import stats
 #' @import numDeriv
 
 #' @export
