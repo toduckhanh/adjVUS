@@ -1,6 +1,6 @@
 #' @import utils
 
-### ---- VUS with three Normal distributions ----
+### ---- VUS with three Normal distributions of test results ----
 #' @export
 vus_normal <- function(mu, sigma){
   a <- sigma[2]/sigma[1]
@@ -34,7 +34,7 @@ vus_normal_bst <- function(mu_B, sigma_B){
   return(res)
 }
 
-### ---- VUS with three Gamma distributions ----
+### ---- VUS with three Gamma distributions of test results ----
 #' @export
 vus_gamma <- function(shape, scale){
   integrate(function(x) pgamma(x, shape = shape[1], scale = scale[1])*
