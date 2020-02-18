@@ -83,6 +83,15 @@ mean(abs(sqrt(var_nonpar) - sqrt(var_true)))
 mean((sqrt(var_par) - sqrt(var_true))^2)
 mean((sqrt(var_nonpar) - sqrt(var_true))^2)
 
+out <- reg_gee(X_mu = cbind(1, x), x_eval = cbind(1, 0.5), X_sig2 = cbind(1, x), Y = y, fun_mu = fun_mu,
+               fun_sig2 = fun_sig2)
+out
+
+out_bst <- reg_gee_bts(X_mu = cbind(1, x), x_eval = cbind(1, 0.5), X_sig2 = cbind(1, x), Y = y, fun_mu = fun_mu,
+                       fun_sig2 = fun_sig2, bet_start = out$bet_start, gam_start = out$gam_start, R = 250)
+out_bst
+
+
 ###
 
 x_eval <- seq(0, 1, length.out = 51)
