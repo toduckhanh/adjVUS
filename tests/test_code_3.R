@@ -1,5 +1,5 @@
 ### ---- Simulating the data ----
-### Normal dítributions
+### Normal distributions
 
 prob_dise <- c(1/3, 1/3, 1/3)
 beta_true <- c(1, 0.5, 2, 0.8, 3.5, 1.2)
@@ -18,9 +18,62 @@ X1 <- X[D_f == 1]
 X2 <- X[D_f == 2]
 X3 <- X[D_f == 3]
 
-Y1 <- cbind(1, X1) %*% beta_true[1:2] + rnorm(sum(D_f == 1), mean = 0, sd = sigma_e[1])
-Y2 <- cbind(1, X2) %*% beta_true[3:4] + rnorm(sum(D_f == 2), mean = 0, sd = sigma_e[2])
-Y3 <- cbind(1, X3) %*% beta_true[5:6] + rnorm(sum(D_f == 3), mean = 0, sd = sigma_e[3])
+Y1 <- as.numeric(cbind(1, X1) %*% beta_true[1:2] + rnorm(sum(D_f == 1), mean = 0, sd = sigma_e[1]))
+Y2 <- as.numeric(cbind(1, X2) %*% beta_true[3:4] + rnorm(sum(D_f == 2), mean = 0, sd = sigma_e[2]))
+Y3 <- as.numeric(cbind(1, X3) %*% beta_true[5:6] + rnorm(sum(D_f == 3), mean = 0, sd = sigma_e[3]))
+
+fun_mu <- function(par, z) as.numeric(z %*% par)
+
+out_gee_1 <- reg_gee(X_mu = cbind(1, X1), x_eval = cbind(1, x), Y = Y1, fun_mu = fun_mu)
+out_gee_1
+
+out_gee_1_bst <- reg_gee_bts(X_mu = cbind(1, X1), x_eval = cbind(1, x), Y = Y1, fun_mu = fun_mu,
+                             bet_start = out_gee_1$bet_start, gam_start = out_gee_1$gam_start, R = 250)
+out_gee_1_bst
+
+out_gee_2 <- reg_gee(X_mu = cbind(1, X2), x_eval = cbind(1, x), Y = Y2, fun_mu = fun_mu)
+out_gee_2
+
+out_gee_2_bst <- reg_gee_bts(X_mu = cbind(1, X2), x_eval = cbind(1, x), Y = Y2, fun_mu = fun_mu,
+                             bet_start = out_gee_2$bet_start, gam_start = out_gee_2$gam_start, R = 250)
+out_gee_2_bst
+
+out_gee_3 <- reg_gee(X_mu = cbind(1, X3), x_eval = cbind(1, x), Y = Y3, fun_mu = fun_mu)
+out_gee_3
+
+out_gee_3_bst <- reg_gee_bts(X_mu = cbind(1, X3), x_eval = cbind(1, x), Y = Y3, fun_mu = fun_mu,
+                             bet_start = out_gee_3$bet_start, gam_start = out_gee_3$gam_start, R = 250)
+out_gee_3_bst
+
+vus_np1(mu = c(out_gee_1$mu_x, out_gee_2$mu_x, out_gee_3$mu_x),
+        sig = c(out_gee_1$var_x, out_gee_2$var_x, out_gee_3$var_x),
+        errors = list(out_gee_1$error, out_gee_2$error, out_gee_3$error))
+
+vus_np2(mu = c(out_gee_1$mu_x, out_gee_2$mu_x, out_gee_3$mu_x),
+        sig = c(out_gee_1$var_x, out_gee_2$var_x, out_gee_3$var_x),
+        errors = list(out_gee_1$error, out_gee_2$error, out_gee_3$error))
+
+mu_gee_x_B <- rbind(out_gee_1_bst$mu_x_B, out_gee_2_bst$mu_x_B, out_gee_3_bst$mu_x_B)
+var_gee_x_B <- rbind(out_gee_1_bst$var_x_B, out_gee_2_bst$var_x_B, out_gee_3_bst$var_x_B)
+error_gee_B <- list()
+for(i in 1:250){
+  error_gee_B[[i]] <- list(out_gee_1_bst$error[,i], out_gee_2_bst$error[,i], out_gee_3_bst$error[,i])
+}
+
+vus_1_bst <- vus_np1_bst(mu_gee_x_B, var_gee_x_B, error_gee_B)
+vus_1_bst$t_bar
+vus_1_bst$t_sd
+hist(vus_1_bst$t)
+sort(vus_1_bst$t)[c(floor(250*0.05/2), floor(250*(1 - 0.05/2)))]
+
+vus_2_bst <- vus_np2_bst(mu_gee_x_B, var_gee_x_B, error_gee_B)
+vus_2_bst$t_bar
+vus_2_bst$t_sd
+hist(vus_2_bst$t)
+sort(vus_2_bst$t)[c(floor(250*0.05/2), floor(250*(1 - 0.05/2)))]
+
+
+
 
 fit_1 <- glm(Y1 ~ X1, family = gaussian(link = "identity"))
 res_1 <- summary(fit_1)
@@ -71,7 +124,7 @@ mu_x_B <- rbind(out_1_bst$mu_x_B, out_2_bst$mu_x_B, out_3_bst$mu_x_B)
 var_x_B <- rbind(out_1_bst$var_x_B, out_2_bst$var_x_B, out_3_bst$var_x_B)
 error_B <- list()
 for(i in 1:250){
-  error_B[[i]] <- list(out_1_bst$error[,i], out_3_bst$error[,i], out_3_bst$error[,i])
+  error_B[[i]] <- list(out_1_bst$error[,i], out_2_bst$error[,i], out_3_bst$error[,i])
 }
 
 vus_1_bst <- vus_np1_bst(mu_x_B, var_x_B, error_B)
