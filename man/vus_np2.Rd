@@ -4,7 +4,7 @@
 \alias{vus_np2}
 \title{Second nonparametric estimation method of VUS}
 \usage{
-vus_np2(mu, sig, errors)
+vus_np2(Y1, Y2, Y3)
 }
 \arguments{
 \item{mu}{a vector of three estimated conditional means for given covariate's value.}
