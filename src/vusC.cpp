@@ -11,7 +11,6 @@ static inline double indvus(double a, double b, double c) {
   }
 }
 
-//' @export
 // [[Rcpp::export]]
 double vusC_full(NumericVector tt1, NumericVector tt2, NumericVector tt3){
   int nn1 = tt1.size(), nn2 = tt2.size(), nn3 = tt3.size();
