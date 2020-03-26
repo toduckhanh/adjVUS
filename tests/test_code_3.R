@@ -11,6 +11,8 @@ mu_true <- c(beta_true[1:2] %*% c(1, x), beta_true[3:4] %*% c(1, x), beta_true[5
 vus_normal(mu_true, sigma_e)
 
 n <- 150
+
+set.seed(308)
 D <- t(rmultinom(n, 1, prob_dise))
 D_f <- apply(D, 1, function(x) which(x == 1))
 X <- runif(n, -2, 2)
@@ -27,31 +29,36 @@ fun_mu <- function(par, z) as.numeric(z %*% par)
 out_gee_1 <- reg_gee(X_mu = cbind(1, X1), x_eval = cbind(1, x), Y = Y1, fun_mu = fun_mu)
 out_gee_1
 
-out_gee_1_bst <- reg_gee_bts(X_mu = cbind(1, X1), x_eval = cbind(1, x), Y = Y1, fun_mu = fun_mu,
-                             bet_start = out_gee_1$bet_start, gam_start = out_gee_1$gam_start, R = 250)
+out_gee_1_bst <- reg_gee_bts_1(X_mu = cbind(1, X1), x_eval = cbind(1, x), Y = Y1, fun_mu = fun_mu,
+                               bet_start = out_gee_1$bet_start, gam_start = out_gee_1$gam_start, R = 250)
 out_gee_1_bst
 
 out_gee_2 <- reg_gee(X_mu = cbind(1, X2), x_eval = cbind(1, x), Y = Y2, fun_mu = fun_mu)
 out_gee_2
 
-out_gee_2_bst <- reg_gee_bts(X_mu = cbind(1, X2), x_eval = cbind(1, x), Y = Y2, fun_mu = fun_mu,
-                             bet_start = out_gee_2$bet_start, gam_start = out_gee_2$gam_start, R = 250)
+out_gee_2_bst <- reg_gee_bts_1(X_mu = cbind(1, X2), x_eval = cbind(1, x), Y = Y2, fun_mu = fun_mu,
+                               bet_start = out_gee_2$bet_start, gam_start = out_gee_2$gam_start, R = 250)
 out_gee_2_bst
 
 out_gee_3 <- reg_gee(X_mu = cbind(1, X3), x_eval = cbind(1, x), Y = Y3, fun_mu = fun_mu)
 out_gee_3
 
-out_gee_3_bst <- reg_gee_bts(X_mu = cbind(1, X3), x_eval = cbind(1, x), Y = Y3, fun_mu = fun_mu,
-                             bet_start = out_gee_3$bet_start, gam_start = out_gee_3$gam_start, R = 250)
+out_gee_3_bst <- reg_gee_bts_1(X_mu = cbind(1, X3), x_eval = cbind(1, x), Y = Y3, fun_mu = fun_mu,
+                               bet_start = out_gee_3$bet_start, gam_start = out_gee_3$gam_start, R = 250)
 out_gee_3_bst
 
 vus_np1(mu = c(out_gee_1$mu_x, out_gee_2$mu_x, out_gee_3$mu_x),
         sig = c(out_gee_1$var_x, out_gee_2$var_x, out_gee_3$var_x),
         errors = list(out_gee_1$error, out_gee_2$error, out_gee_3$error))
 
-vus_np2(mu = c(out_gee_1$mu_x, out_gee_2$mu_x, out_gee_3$mu_x),
-        sig = c(out_gee_1$var_x, out_gee_2$var_x, out_gee_3$var_x),
-        errors = list(out_gee_1$error, out_gee_2$error, out_gee_3$error))
+vus_np1_est <- vus_np1_fy(Y1 = out_gee_1$y_hat, Y2 = out_gee_2$y_hat, Y3 = out_gee_3$y_hat)
+
+vus_np2(Y1 = out_gee_1$y_hat, Y2 = out_gee_2$y_hat, Y3 = out_gee_3$y_hat)
+
+vus_np1_fy_bst(Y1_B = out_gee_1_bst$y_hat, Y2_B = out_gee_2_bst$y_hat, Y3_B = out_gee_3_bst$y_hat,
+               bw1 = vus_np1_est$bws[1], bw2 = vus_np1_est$bws[2], bw3 = vus_np1_est$bws[3])
+
+vus_np2_bst(Y1_B = out_gee_1_bst$y_hat, Y2_B = out_gee_2_bst$y_hat, Y3_B = out_gee_3_bst$y_hat)
 
 mu_gee_x_B <- rbind(out_gee_1_bst$mu_x_B, out_gee_2_bst$mu_x_B, out_gee_3_bst$mu_x_B)
 var_gee_x_B <- rbind(out_gee_1_bst$var_x_B, out_gee_2_bst$var_x_B, out_gee_3_bst$var_x_B)
